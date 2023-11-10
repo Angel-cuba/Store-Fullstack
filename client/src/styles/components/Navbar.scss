@@ -1,0 +1,63 @@
+@import '../mixins.scss';
+
+.navbar {
+  background-color: #233329;
+  position: fixed;
+  top: 0;
+  width: 100%;
+  height: 80px;
+  box-shadow: 1px 1px 12px 1px rgba(35, 51, 41, 0.532);
+  color: #fff;
+  z-index: 100;
+  .navbar-container {
+    position: relative;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 70%;
+    height: 100%;
+    margin: 0 auto;
+    .navbar-logo {
+      position: relative;
+    }
+    .navbar-menu {
+      position: relative;
+      .toggle-theme {
+        position: absolute;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        top: 30%;
+        left: -150px;
+        cursor: pointer;
+        .sun-light {
+          display: none;
+        }
+        .sun-dark {
+          font-size: 2em;
+          color: rgb(242, 255, 0);
+        }
+        .moon-dark {
+          display: none;
+        }
+        .moon-light {
+          font-size: 1.72em;
+          color: #ededed;
+        }
+      }
+      ul {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        width: 300px;
+        height: 100%;
+        li {
+          list-style: none;
+          a {
+            @include link(rgba(255, 255, 255, 0), #ffffffc8, 2px, 1px);
+          }
+        }
+      }
+    }
+  }
+}

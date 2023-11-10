@@ -1,0 +1,160 @@
+@import '../../mixins.scss';
+.users {
+  width: 100%;
+  min-height: 100vh;
+  margin-top: 80px;
+  a {
+    @include link(rgba(223, 0, 0, 0.746), #ffffffc8, 4%, 2%);
+    border-radius: 5px;
+    padding: 1px 20px;
+  }
+  .user_content {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+    flex-wrap: wrap;
+    padding-left: 30px;
+    padding-top: 30px;
+    .user-container {
+      position: relative;
+      width: fit-content;
+      .user {
+        position: relative;
+        width: 200px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-direction: column;
+        background-color: #232d1ffd;
+        border-radius: 10px;
+        padding: 5px;
+        margin: 10px;
+
+        .user-face {
+          width: 100%;
+          height: 100%;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          h1 {
+            font-size: 1.5rem;
+            color: rgb(206, 26, 26);
+            margin-bottom: 10px;
+          }
+          .user-image {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            margin-bottom: 10px;
+            cursor: pointer;
+            img {
+              width: 100%;
+              height: 100%;
+              border-radius: 50%;
+            }
+          }
+        }
+      }
+      .user-history {
+        color: #f4f4f4c8;
+        border-radius: 10px;
+        text-align: center;
+        width: fit-content;
+        margin: auto;
+        position: absolute;
+        top: -1rem;
+        left: 15rem;
+        h3 {
+          color: rgb(255, 111, 0);
+          font-size: 20px;
+        }
+        .user-history-info {
+          position: relative;
+          width: 500px;
+          min-height: 300px;
+          max-height: 400px;
+          // background-color: rgb(17, 17, 230);
+          overflow-y: scroll;
+          padding-bottom: 0.5rem;
+          box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.5);
+          border-radius: 5px;
+          border-bottom: 1px solid #00000028;
+          .singleHistory-info {
+            color: #000000;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            .single {
+              min-width: 96%;
+              background-color: #09add61e;
+              box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.5);
+              margin: 0.3rem 0.51rem;
+              border-radius: 10px;
+              .user-details {
+                min-width: 300px;
+                // background-color: #d60909;
+                display: flex;
+                // flex-direction: column;
+                justify-content: space-between;
+                align-items: center;
+                padding: 3px;
+                border-radius: 10px;
+                .user-image {
+                  min-width: 40px;
+                  height: 40px;
+                  border-radius: 5px;
+                  margin-bottom: 10px;
+                  cursor: pointer;
+                  img {
+                    width: 100%;
+                    height: 100%;
+                    border-radius: 5px;
+                  }
+                }
+                p{
+                  font-size: 1.02rem;
+                  color: #333;
+                  font-weight: bold;
+                  box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.0639);
+                  border-radius: 5px;
+                  padding: 0.012rem;
+                  margin: 0 0.241rem;
+                }
+                a {
+                  @include link(rgba(69, 122, 0, 0.917), #200000c8, 0, 0);
+                  border-radius: 5px;
+                  padding: 1px 20px;
+                }
+              }
+            }
+            .btn-close {
+              background-color: rgba(223, 0, 0, 0.746);
+              color: #09add6;
+              border-radius: 5px;
+              padding: 2px 5px;
+              border: none;
+              box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+              cursor: pointer;
+              font-size: 1.5rem;
+              &:hover {
+                background-color: #09add6;
+                color: rgba(223, 0, 0, 0.746);
+                box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.2);
+              }
+            }
+            .line {
+              width: 100%;
+              height: 1px;
+              background-color: rgba(255, 255, 255, 0.219);
+              margin-top: 2px;
+            }
+          }
+        }
+      }
+    }
+    .user-history-hidden {
+      display: none;
+      background-color: #ff0808fd;
+    }
+  }
+}

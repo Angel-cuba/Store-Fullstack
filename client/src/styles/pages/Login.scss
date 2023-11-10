@@ -1,0 +1,80 @@
+.login {
+  width: 100%;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  .login-form {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    box-shadow: 0 1px 6px 2px #e1e1e1;
+    padding: 50px 40px;
+    border-radius: 15px;
+    background-color: rgba(255, 255, 255, 0.412);
+    backdrop-filter: blur(10px);
+    .btn {
+      border-radius: 8px;
+      color: #f4f4f4;
+      font-size: 18px;
+      font-weight: bold;
+      padding: 5px;
+      width: 190px;
+      height: 30px;
+      cursor: pointer;
+      outline: none;
+      border: none;
+    }
+    .btn-login {
+      background-color: #063d00;
+      &:hover {
+        background-color: #f4f4f4;
+        box-shadow: 0 1px 5px 2px #24242448;
+        color: #063d00;
+      }
+    }
+    .login-google {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+      color: #e53935;
+      .icon-google {
+        font-size: 3rem;
+        font-weight: bold;
+      }
+      .btn-google {
+        background-color: #e53935;
+        &:hover {
+          background-color: #fcdfde;
+          box-shadow: 0 1px 5px 2px #df45428a;
+          color: #e53935;
+        }
+      }
+    }
+  }
+  .line {
+    margin: 30px auto;
+    position: relative;
+  }
+  .line::before {
+    content: '';
+    width: 140px;
+    left: -150px;
+    top: 50%;
+    height: 1px;
+    background-color: #04000018;
+    position: absolute;
+  }
+  .line::after {
+    content: '';
+    width: 140px;
+    right: -150px;
+    top: 50%;
+    height: 1px;
+    background-color: #04000018;
+    position: absolute;
+  }
+}
