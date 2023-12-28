@@ -12,7 +12,7 @@ import {
 } from '../controllers/products'
 import { isAdmin } from '../middlewares/authAdmin'
 
-router.get('/all', verifyAuth, allProducts)
+router.get('/all', allProducts)
 router.get('/search', verifyAuth, getProductsBySearch)
 router.post('/', isAdmin, createProduct)
 /**Id is required */
