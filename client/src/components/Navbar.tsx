@@ -5,14 +5,13 @@ import { Link, useNavigate } from 'react-router-dom';
 import { signInSuccess } from '../redux/actions/user.actions';
 import '../styles/components/Navbar.scss';
 import { AppState } from '../types/ProductType';
-import Loading from './Loading';
 import Cart from './Products/Cart';
 import { ToggleTheme } from './ToggleTheme';
 import UserHistory from './User/History';
 
 const Navbar = () => {
   const { user }: any = useSelector((state: AppState) => state.user);
-  const userToken = localStorage.getItem('token');
+  // const userToken = localStorage.getItem('token');
   const dispatch = useDispatch<any>();
 
   const navigate = useNavigate();
@@ -26,12 +25,12 @@ const Navbar = () => {
     dispatch(signInSuccess());
   }, [dispatch]);
 
-  if (!user) {
-    return <Loading />;
-  }
-  if (!userToken) {
-    navigate('/login');
-  }
+  // if (!user) {
+  //   return <Loading />;
+  // }
+  // if (!userToken) {
+  //   navigate('/login');
+  // }
   return (
     <div className="navbar">
       <div className="navbar-container">
@@ -41,11 +40,11 @@ const Navbar = () => {
         <div className="navbar-menu">
           <ToggleTheme />
           <ul>
-            {!userToken && (
+            {/* {!userToken && ( */}
               <li>
                 <Link to="/login">Login</Link>
               </li>
-            )}
+            {/* )} */}
 
             <li>
               <Link to="/">Home</Link>

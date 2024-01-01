@@ -2,9 +2,9 @@ import React from 'react';
 import { Toaster } from 'react-hot-toast';
 import { useSelector } from 'react-redux';
 import { useLocation, useNavigate } from 'react-router-dom';
-import '../styles/components/Loading.scss';
 import { AppState } from '../types/ProductType';
 import { handleToast } from '../util/helpers';
+import '../styles/components/Loading.scss';
 
 const Loading = () => {
   const navigate = useNavigate();
@@ -12,18 +12,19 @@ const Loading = () => {
 
   //Cart history
   const { inCart }: any = useSelector((state: AppState) => state.cart);
-  React.useEffect(() => {
-    const token = localStorage.getItem('token') as string;
-    const goBack = () => {
-      navigate('/login');
-    };
-    setTimeout(() => {
-      if (!token) {
-        handleToast('Redirect');
-        goBack();
-      }
-    }, 1000);
-  }, [navigate, location]);
+  //TODO: Fix this useEffect
+  // React.useEffect(() => {
+  //   const token = localStorage.getItem('token') as string;
+  //   // const goBack = () => {
+  //   //   navigate('/login');
+  //   // };
+  //   // setTimeout(() => {
+  //   //   if (!token) {
+  //   //     handleToast('Redirect');
+  //   //     goBack();
+  //   //   }
+  //   // }, 1000);
+  // }, [navigate, location]);
 
   return (
     <div className="loading">
