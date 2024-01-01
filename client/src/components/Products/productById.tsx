@@ -7,13 +7,13 @@ import '../../styles/components/Products/Products.scss';
 
 const ProductId = () => {
   const dispatch = useDispatch<any>();
-  const { productId }: any = useParams();
+  const { id } = useParams();
   const { product } = useSelector((state: AppState) => state.products);
 
   useEffect(() => {
     document.title = 'Product';
-    dispatch(fetchProductById(productId));
-  }, [productId, dispatch]);
+    if (id) dispatch(fetchProductById(id));
+  }, [id, dispatch]);
 
   console.log(product);
 
