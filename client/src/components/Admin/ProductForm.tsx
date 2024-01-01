@@ -3,7 +3,7 @@ import { Toaster } from 'react-hot-toast';
 import { useDispatch, useSelector } from 'react-redux';
 import { useParams } from 'react-router-dom';
 import { EditingProduct, NewProduct } from '../../api/requests';
-import { Styles } from '../../pages/FirsLoginPage';
+import { commonStyles } from '../../pages/LoginPage';
 import { fetchProductById } from '../../redux/actions/products.action';
 import '../../styles/components/Admin/ProductForm.scss';
 import { AppState } from '../../types/ProductType';
@@ -77,7 +77,6 @@ const ProductForm = () => {
     }
   };
 
-  // navigate('/')
   return (
     <div className="productForm">
       <div className="container">
@@ -90,7 +89,7 @@ const ProductForm = () => {
             placeholder={!id ? 'Name' : `${product?.name}`}
             value={name}
             onChange={handleName}
-            style={Styles}
+            style={commonStyles}
             message={id && product?.name}
           />
           <Input
@@ -99,7 +98,7 @@ const ProductForm = () => {
             placeholder={!id ? 'Description' : `${product?.description}`}
             value={description}
             onChange={handleDescription}
-            style={Styles}
+            style={commonStyles}
             message={id && product?.description}
           />
           <Input
@@ -108,7 +107,7 @@ const ProductForm = () => {
             placeholder={!id ? 'Image' : `${product?.image}`}
             value={image}
             onChange={handleImage}
-            style={Styles}
+            style={commonStyles}
             message={id && product?.image}
           />
           <Input
@@ -117,7 +116,7 @@ const ProductForm = () => {
             placeholder={!id ? 'Category' : `${product?.category}`}
             value={category}
             onChange={handleCategory}
-            style={Styles}
+            style={commonStyles}
             message={id && product?.category}
           />
           <Input
@@ -126,7 +125,7 @@ const ProductForm = () => {
             placeholder={id ? 'Rating' : `${product?.rating}`}
             value={rating}
             onChange={handleRating}
-            style={Styles}
+            style={commonStyles}
             message={id && product?.rating}
           />
           <Input
@@ -135,7 +134,7 @@ const ProductForm = () => {
             placeholder={id ? `The price is ${product?.price} €` : 'Price'}
             value={price}
             onChange={handlePrice}
-            style={Styles}
+            style={commonStyles}
             message={id && `${product?.price} €`}
           />
           {(id && (!name || !description || !image || !category || !rating || !price)) ||
