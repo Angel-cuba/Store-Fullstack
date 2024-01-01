@@ -4,7 +4,6 @@ import { Routes, Route, useLocation } from 'react-router-dom';
 import Admin from './pages/AdminPage';
 import Home from './pages/HomePage';
 import ProductId from './components/Products/productById';
-import Login from './pages/Login';
 import ProductForm from './components/Admin/ProductForm';
 import NotUserFound from './pages/NotUserFound';
 import Payment from './components/Products/Payment';
@@ -25,7 +24,7 @@ export default function App() {
 
   const loginRoutes: RouteType[] = [
     { path: '/login', element: <LoginPage /> },
-    { path: '/register', element: <Login /> },
+    { path: '/register', element: <LoginPage /> },
   ];
 
   const notLoggedUserRoutes: RouteType[] = [
@@ -37,6 +36,7 @@ export default function App() {
   ];
 
   const loggedUserRoutes: RouteType[] = [
+    { path: '*', element: <Home />},
     { path: '/', element: <Home /> },
     { path: '/product/:id', element: <ProductId /> },
     { path: '/payment', element: <Payment /> },

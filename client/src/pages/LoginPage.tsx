@@ -1,6 +1,9 @@
 import React, { useState } from 'react';
 import { FaGooglePlusSquare } from 'react-icons/fa';
 import { Input } from '../components/Input';
+import { loginRequest } from '../api/signIn';
+
+import { useNavigate } from 'react-router';
 import '../styles/pages/Login.scss';
 
 const emailValidator =
@@ -12,6 +15,7 @@ type Email = {
 };
 
 const LoginPage = () => {
+  const navigate = useNavigate();
   const [email, setEmail] = useState<Email>({
     error: false,
     value: '',
@@ -35,6 +39,7 @@ const LoginPage = () => {
   const handleSubmit = () => {
     if (email.error) return;
     console.log(email.value, password);
+    loginRequest(email.value, password, navigate);
   };
 
   return (

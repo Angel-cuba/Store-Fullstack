@@ -1,17 +1,20 @@
 import React from 'react';
 import { useDispatch } from 'react-redux';
-import { useSelector } from 'react-redux';
 import { Link, useNavigate } from 'react-router-dom';
 import { signInSuccess } from '../redux/actions/user.actions';
 import '../styles/components/Navbar.scss';
-import { AppState } from '../types/ProductType';
 import Cart from './Products/Cart';
 import { ToggleTheme } from './ToggleTheme';
 import UserHistory from './User/History';
+import { useSelector } from 'react-redux';
+import { AppState } from '../types/ProductType';
 
 const Navbar = () => {
+  //:TODO: Fix this user data request
   const { user }: any = useSelector((state: AppState) => state.user);
-  // const userToken = localStorage.getItem('token');
+  console.log("🚀 ~ file: Navbar.tsx:15 ~ Navbar ~ user:", user)
+  const userToken: string | null = localStorage.getItem('token');
+  const userRole: string | null = localStorage.getItem('userRole');
   const dispatch = useDispatch<any>();
 
   const navigate = useNavigate();
@@ -25,12 +28,6 @@ const Navbar = () => {
     dispatch(signInSuccess());
   }, [dispatch]);
 
-  // if (!user) {
-  //   return <Loading />;
-  // }
-  // if (!userToken) {
-  //   navigate('/login');
-  // }
   return (
     <div className="navbar">
       <div className="navbar-container">
@@ -40,23 +37,23 @@ const Navbar = () => {
         <div className="navbar-menu">
           <ToggleTheme />
           <ul>
-            {/* {!userToken && ( */}
-              <li>
-                <Link to="/login">Login</Link>
-              </li>
-            {/* )} */}
-
             <li>
               <Link to="/">Home</Link>
             </li>
-            {user && user.role === 'ADMIN' && (
+            {userToken && userRole?.includes('ADMIN') ? (
               <li>
                 <Link to="/admin">Admin</Link>
               </li>
+            ) : null}
+            {!userToken ? (
+              <li>
+                <Link to="/login">Login</Link>
+              </li>
+            ) : (
+              <li onClick={logoutUser}>
+                <Link to="/">Logout</Link>
+              </li>
             )}
-            <li onClick={logoutUser}>
-              <Link to="/login">Logout</Link>
-            </li>
 
             <li></li>
           </ul>
