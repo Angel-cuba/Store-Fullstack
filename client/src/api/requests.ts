@@ -5,28 +5,12 @@ import { BASE_URL } from '../util/helpers';
 import { verifyTokenExpiration } from '../util/tokenExpired';
 
 export const AllProducts = async () => {
-  const token = localStorage.getItem('token') as any;
-  const { isVerified } = await verifyTokenExpiration(token);
-  if (!isVerified) return;
-  //Continue here if token is verified
-  const response = await axios.get(`${BASE_URL}/products/all`, {
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-  });
+  const response = await axios.get(`${BASE_URL}/products/all`);
   return response.data;
 };
 
 export const ProductById = async (id: string) => {
-  let token = localStorage.getItem('token') as any;
-  const { isVerified } = await verifyTokenExpiration(token);
-  if (!isVerified) return;
-  //Continue here if token is verified
-  const response = await axios.get(`${BASE_URL}/products/${id}`, {
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-  });
+  const response = await axios.get(`${BASE_URL}/products/${id}`);
   return response.data;
 };
 
