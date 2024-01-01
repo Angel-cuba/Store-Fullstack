@@ -13,10 +13,10 @@ import {
 import { isAdmin } from '../middlewares/authAdmin'
 
 router.get('/all', allProducts)
-router.get('/search', verifyAuth, getProductsBySearch)
+router.get('/search', getProductsBySearch)
 router.post('/', isAdmin, createProduct)
 /**Id is required */
-router.get('/:id', verifyAuth, getProduct)
+router.get('/:id', getProduct)
 router.put('/:id', isAdmin, updateProduct)
 router.delete('/:id', isAdmin, deleteProduct)
 
