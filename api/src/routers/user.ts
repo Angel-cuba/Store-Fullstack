@@ -10,16 +10,18 @@ import {
 } from '../controllers/user'
 const router = Router()
 
-router.post('/signup', signUp)
 router.get('/:id', verifyAuth, getAnUser)
 router.put('/:id', verifyAuth, updateAnUser)
 router.delete('/:id', verifyAuth, deletingUser)
 
 //Login user
 router.post(
-  '/signin-google',
-  passport.authenticate('google-id-token', { session: false }),
+  '/signin',
+  // passport.authenticate('google-id-token', { session: false }),
   login
 )
+router.post('/signup', signUp)
+
+//Register user
 
 export default router

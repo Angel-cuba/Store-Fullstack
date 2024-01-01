@@ -2,6 +2,7 @@ import { Request, Response, NextFunction } from 'express'
 import User, { UserInterface } from '../models/User'
 import userService from '../services/user'
 import jwt from 'jsonwebtoken'
+import bcrypt from 'bcrypt'
 import keys from '../config/keys'
 
 export const signUp = async (
@@ -9,18 +10,39 @@ export const signUp = async (
   res: Response,
   next: NextFunction
 ) => {
-  const { name, lastname, picture, email, role } = req.body
+  const { name, lastname, picture, email, password, role } = req.body
 
+  const existingUser = await userService.getUserByEmail(email)
+  // Check if user exists
+  if (existingUser) {
+    return res
+      .status(400)
+      .json({ message: `User with email ${email} exists already` })
+  }
+  // Hash password
+  const hashedPassword = await bcrypt.hash(password, 12)
+
+  // Create an user instance
   const user = new User({
     name,
     lastname,
     picture,
     email,
-    role,
+    password: hashedPassword,
+    role: role || 'USER',
+    band: false,
   })
   try {
     await userService.createUser(user)
-    res.status(200).json(user)
+    const token = jwt.sign(
+      {
+        email,
+      },
+      keys.PRIVATE_KEY as string,
+      { expiresIn: '1h' }
+    )
+    const { name, role } = user
+    res.status(200).json({ token, user: { name, role } })
   } catch (err) {
     res.status(404).send(err)
   }
@@ -72,18 +94,27 @@ export const login = async (
   res: Response,
   next: NextFunction
 ) => {
-  const user = req.user as any
+  const { email, password } = req.body
 
+  // Check if user exists
+  const user = await userService.getUserByEmail(email)
+  if (!user) {
+    return res.status(404).json({ message: 'User not found' })
+  }
+  // Check password
+  const isValidPassword = await bcrypt.compare(password, user.password)
+  if (!isValidPassword) {
+    return res.status(400).json({ message: 'Invalid password' })
+  }
+
+  // Create token
   const token = jwt.sign(
     {
-      picture: user.picture,
-      email: user.email,
-      role: user.role,
-      name: user.name,
-      id: user._id,
+      email,
     },
     keys.PRIVATE_KEY as string,
     { expiresIn: '1h' }
   )
-  res.json({ token })
+  // Return token and user data
+  res.json({ token, user: { name: user.name, role: user.role } })
 }

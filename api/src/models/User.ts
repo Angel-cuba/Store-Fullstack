@@ -5,6 +5,7 @@ export interface UserInterface extends Document {
   lastname: string
   picture: string
   email: string
+  password: string
   role: string
   band: boolean
 }
@@ -37,6 +38,12 @@ const userSchema = new Schema({
     ],
     trim: true,
   },
+  password: {
+    type: String,
+    required: [true, 'Password is required'],
+    minlength: [6, 'Password must be at least 6 characters long'],
+    trim: true,
+  },
   role: {
     type: String,
     enum: ['USER', 'ADMIN'],
@@ -47,13 +54,5 @@ const userSchema = new Schema({
     default: false,
   },
 })
-
-// userSchema.pre<IUser>("save", async function (next) {
-//     if (!this.isModified("password")) {
-//         return next();
-//     }
-//     this.password = await bcrypt.hash(this.password, 10);
-//     next();
-// });
 
 export default model<UserInterface>('User', userSchema)
