@@ -15,21 +15,16 @@ export default async function verifyAuth(
     const PRIVATE_KEY = keys.PRIVATE_KEY as string
 
     const decodedUser = jwt.verify(token, PRIVATE_KEY)
-    // console.log('decodedUser',decodedUser)
-    //If i want to send more info from user
     const { email } = decodedUser as { email: string }
     const fullUser = await userService.getUserByEmail(email)
 
-    //Missing data in decodedUser to send to the frontend
-    // const dataOfUser = {
-    //   name: fullUser?.name,
-    //   picture: fullUser?.picture,
-    //   role: fullUser?.role,
-    // }
-    req.user = { decodedUser }
+    if (!fullUser) {
+      throw new ForbiddenError()
+    }
+
+    req.currentUser = fullUser
     next()
   } catch (error) {
-    console.log('error', error)
     throw new ForbiddenError()
   }
 }

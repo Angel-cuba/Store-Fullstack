@@ -1,7 +1,7 @@
 import { Router } from 'express'
 import verifyAuth from '../middlewares/authorization'
-const router = Router()
-
+import { isAdmin } from '../middlewares/authAdmin'
+import { productRules, handleValidation } from '../middlewares/validate'
 import {
   allProducts,
   createProduct,
@@ -10,14 +10,28 @@ import {
   getProductsBySearch,
   updateProduct,
 } from '../controllers/products'
-import { isAdmin } from '../middlewares/authAdmin'
+
+const router = Router()
 
 router.get('/all', allProducts)
 router.get('/search', getProductsBySearch)
-router.post('/', isAdmin, createProduct)
-/**Id is required */
+router.post(
+  '/',
+  verifyAuth,
+  isAdmin,
+  productRules,
+  handleValidation,
+  createProduct
+)
 router.get('/:id', getProduct)
-router.put('/:id', isAdmin, updateProduct)
-router.delete('/:id', isAdmin, deleteProduct)
+router.put(
+  '/:id',
+  verifyAuth,
+  isAdmin,
+  productRules,
+  handleValidation,
+  updateProduct
+)
+router.delete('/:id', verifyAuth, isAdmin, deleteProduct)
 
 export default router

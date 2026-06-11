@@ -9,13 +9,14 @@ import NotUserFound from './pages/NotUserFound';
 import Payment from './components/Products/Payment';
 import UsersHistory from './components/Admin/UsersHistory';
 import LoginPage from './pages/LoginPage';
+import RegisterPage from './pages/RegisterPage';
 import './styles/App.scss';
 
 export default function App() {
   const { theme } = useTheme();
   const userToken = localStorage.getItem('token');
   const location = useLocation();
-  const isAdmin = localStorage.getItem('isAdmin');
+  const isAdmin = localStorage.getItem('userRole')?.includes('ADMIN');
 
   type RouteType = {
     path: string;
@@ -24,11 +25,10 @@ export default function App() {
 
   const loginRoutes: RouteType[] = [
     { path: '/login', element: <LoginPage /> },
-    { path: '/register', element: <LoginPage /> },
+    { path: '/register', element: <RegisterPage /> },
   ];
 
   const notLoggedUserRoutes: RouteType[] = [
-    { path: '/', element: <Home /> },
     { path: '/', element: <Home /> },
     { path: '*', element: <Home /> },
     { path: '/product/:id', element: <ProductId /> },
@@ -36,12 +36,11 @@ export default function App() {
   ];
 
   const loggedUserRoutes: RouteType[] = [
-    { path: '*', element: <Home />},
+    { path: '*', element: <Home /> },
     { path: '/', element: <Home /> },
     { path: '/product/:id', element: <ProductId /> },
     { path: '/payment', element: <Payment /> },
     { path: '/history', element: <UsersHistory /> },
-    { path: '/payment', element: <Payment /> },
   ];
 
   const adminRoutes: RouteType[] = [

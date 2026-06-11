@@ -7,7 +7,7 @@ export interface UserInterface extends Document {
   email: string
   password: string
   role: string
-  band: boolean
+  ban: boolean
 }
 
 const userSchema = new Schema({

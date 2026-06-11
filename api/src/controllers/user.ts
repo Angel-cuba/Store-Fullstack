@@ -5,6 +5,19 @@ import jwt from 'jsonwebtoken'
 import bcrypt from 'bcrypt'
 import keys from '../config/keys'
 
+export const googleSignIn = (req: Request, res: Response) => {
+  const user = req.user as UserInterface
+  if (!user) {
+    return res.status(401).json({ message: 'Google authentication failed' })
+  }
+  const token = jwt.sign(
+    { email: user.email, role: user.role || 'USER', id: user._id },
+    keys.PRIVATE_KEY as string,
+    { expiresIn: '1h' }
+  )
+  res.json({ token, name: user.name, role: user.role || 'USER' })
+}
+
 export const signUp = async (
   req: Request,
   res: Response,
@@ -30,7 +43,7 @@ export const signUp = async (
     email,
     password: hashedPassword,
     role: role || 'USER',
-    band: false,
+    ban: false,
   })
   try {
     await userService.createUser(user)
@@ -66,6 +79,12 @@ export const updateAnUser = async (
   next: NextFunction
 ) => {
   const { id } = req.params
+  const requestingUser = req.currentUser!
+  if (requestingUser._id.toString() !== id && requestingUser.role !== 'ADMIN') {
+    return res
+      .status(403)
+      .json({ message: 'You are not authorized to update this user' })
+  }
   try {
     const user = await userService.updateAnUser(id, req.body)
     res.status(200).json(user)
@@ -80,6 +99,12 @@ export const deletingUser = async (
   next: NextFunction
 ) => {
   const { id } = req.params
+  const requestingUser = req.currentUser!
+  if (requestingUser._id.toString() !== id && requestingUser.role !== 'ADMIN') {
+    return res
+      .status(403)
+      .json({ message: 'You are not authorized to delete this user' })
+  }
   try {
     const user = await userService.deleteAnUser(id)
     res.status(200).json({ message: `User ${user?.name} deleted` })
@@ -96,12 +121,13 @@ export const login = async (
 ) => {
   const { email, password } = req.body
 
-  // Check if user exists
   const user = await userService.getUserByEmail(email)
   if (!user) {
     return res.status(404).json({ message: 'User not found' })
   }
-  // Check password
+  if (user.ban) {
+    return res.status(403).json({ message: 'Your account has been suspended' })
+  }
   const isValidPassword = await bcrypt.compare(password, user.password)
   if (!isValidPassword) {
     return res.status(400).json({ message: 'Invalid password' })

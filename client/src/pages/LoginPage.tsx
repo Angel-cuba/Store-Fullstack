@@ -1,9 +1,8 @@
 import React, { useState } from 'react';
-import { FaGooglePlusSquare } from 'react-icons/fa';
+import { Link, useNavigate } from 'react-router-dom';
+import { GoogleLogin, CredentialResponse } from '@react-oauth/google';
 import { Input } from '../components/Input';
-import { loginRequest } from '../api/signIn';
-
-import { useNavigate } from 'react-router';
+import { loginRequest, googleSignInRequest } from '../api/signIn';
 import '../styles/pages/Login.scss';
 
 const emailValidator =
@@ -38,7 +37,6 @@ const LoginPage = () => {
 
   const handleSubmit = () => {
     if (email.error) return;
-    console.log(email.value, password);
     loginRequest(email.value, password, navigate);
   };
 
@@ -67,10 +65,24 @@ const LoginPage = () => {
           Login
         </button>
 
+        <p style={{ marginTop: '0.5rem', fontSize: '14px', textAlign: 'center' }}>
+          No account?{' '}
+          <Link to="/register" style={{ color: '#001a4f', fontWeight: 'bold' }}>
+            Create one
+          </Link>
+        </p>
         <div className="line">or</div>
         <div className="login-google">
-          <FaGooglePlusSquare className="icon-google" />
-          <button className="btn btn-google">Login with Google</button>
+          <GoogleLogin
+            onSuccess={(response: CredentialResponse) => {
+              if (response.credential) {
+                googleSignInRequest(response.credential, navigate);
+              }
+            }}
+            onError={() => {
+              console.error('Google login failed');
+            }}
+          />
         </div>
       </div>
     </div>

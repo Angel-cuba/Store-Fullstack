@@ -5,8 +5,24 @@ const create = async (product: IProduct): Promise<IProduct> => {
   return product.save()
 }
 
-const getAll = async (): Promise<IProduct[]> => {
-  return Product.find()
+export type PaginatedResult<T> = {
+  data: T[]
+  total: number
+  page: number
+  limit: number
+  totalPages: number
+}
+
+const getAll = async (
+  page: number,
+  limit: number
+): Promise<PaginatedResult<IProduct>> => {
+  const skip = (page - 1) * limit
+  const [data, total] = await Promise.all([
+    Product.find().sort({ createdAt: -1 }).skip(skip).limit(limit),
+    Product.countDocuments(),
+  ])
+  return { data, total, page, limit, totalPages: Math.ceil(total / limit) }
 }
 
 //Searching with query parameters

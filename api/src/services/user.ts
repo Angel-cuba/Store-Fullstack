@@ -1,4 +1,5 @@
 import User, { UserInterface } from '../models/User'
+import { PaginatedResult } from './product'
 
 const createUser = async (user: UserInterface): Promise<UserInterface> => {
   return user.save()
@@ -23,8 +24,16 @@ const deleteAnUser = async (id: string): Promise<UserInterface | null> => {
   return User.findByIdAndDelete(id)
 }
 
-const getAllUsers = async (): Promise<UserInterface[]> => {
-  return User.find({ role: 'USER' })
+const getAllUsers = async (
+  page: number,
+  limit: number
+): Promise<PaginatedResult<UserInterface>> => {
+  const skip = (page - 1) * limit
+  const [data, total] = await Promise.all([
+    User.find({ role: 'USER' }).skip(skip).limit(limit),
+    User.countDocuments({ role: 'USER' }),
+  ])
+  return { data, total, page, limit, totalPages: Math.ceil(total / limit) }
 }
 
 export default {

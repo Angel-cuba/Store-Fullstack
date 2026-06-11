@@ -7,8 +7,13 @@ export const allProducts = async (
   res: Response,
   next: NextFunction
 ) => {
+  const page = Math.max(1, parseInt(req.query.page as string) || 1)
+  const limit = Math.min(
+    100,
+    Math.max(1, parseInt(req.query.limit as string) || 20)
+  )
   try {
-    res.json(await productService.getAll())
+    res.json(await productService.getAll(page, limit))
   } catch (error) {
     res.status(404).send(error)
   }
@@ -64,7 +69,6 @@ export const createProduct = async (
   next: NextFunction
 ) => {
   const { name, price, description, image, category, rating } = req.body
-  console.log(req.body)
   const product = new Product({
     name,
     description,

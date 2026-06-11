@@ -9,18 +9,12 @@ export const signInSuccess = () => async (dispatch: Dispatch) => {
       type: LOGIN_USER,
       payload: data,
     });
-  } catch (error) {
-    console.log(error);
+  } catch {
+    // token absent or invalid — stay logged out
   }
 };
 
 export const logOut = () => async (dispatch: Dispatch) => {
-  try {
-    localStorage.removeItem('token');
-    dispatch({
-      type: LOGOUT_USER,
-    });
-  } catch (error) {
-    console.log(error);
-  }
+  localStorage.removeItem('token');
+  dispatch({ type: LOGOUT_USER });
 };

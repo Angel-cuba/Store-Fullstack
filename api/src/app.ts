@@ -1,8 +1,8 @@
 import express from 'express'
 import passport from 'passport'
-import dotenv from 'dotenv'
 import morgan from 'morgan'
 import cors from 'cors'
+import helmet from 'helmet'
 import 'dotenv/config'
 import keys from './config/keys'
 
@@ -24,12 +24,16 @@ import loginWithGoogle from './passport/GoogleStrategy'
 app.set('port', keys.PORT || 4000)
 
 // Global middleware
+app.use(helmet())
 app.use(apiContentType)
 app.use(express.json())
-//Other middlewares
 app.use(morgan('dev'))
-app.use(cors())
-app.use(express.json())
+app.use(
+  cors({
+    origin: process.env.CLIENT_URL || 'http://localhost:3000',
+    credentials: true,
+  })
+)
 //Passport middleware
 app.use(passport.initialize())
 passport.use(loginWithGoogle())

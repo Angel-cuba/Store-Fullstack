@@ -1,26 +1,30 @@
-import { model, Schema, Document } from 'mongoose'
+import { model, Schema, Document, Types } from 'mongoose'
+
+export type OrderStatus = 'pending' | 'shipped' | 'delivered' | 'cancelled'
 
 export interface OrderInterface extends Document {
-  name: string
-  lastname: string
-  picture: string
-  email: string
-  role: string
-  band: boolean
+  products: Types.ObjectId[]
+  user: Types.ObjectId
+  status: OrderStatus
+  createdAt: Date
+  shippingAddress?: string
 }
 
 const orderSchema = new Schema({
-  // one to many relation -> one Order to Many products
   products: [
     {
       type: Schema.Types.ObjectId,
       ref: 'Product',
     },
   ],
-  // one to one relation -> one Order to One user
   user: {
     type: Schema.Types.ObjectId,
     ref: 'User',
+  },
+  status: {
+    type: String,
+    enum: ['pending', 'shipped', 'delivered', 'cancelled'],
+    default: 'pending',
   },
   createdAt: {
     type: Date,
