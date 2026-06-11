@@ -6,9 +6,11 @@ import { fetchAllProducts } from '../redux/actions/products.action';
 import '../styles/pages/Home.scss';
 import Navbar from '../components/Navbar';
 import { useLocation, useNavigate } from 'react-router';
+import { verifyTokenExpiration } from '../util/tokenExpired';
+import { AppDispatch } from '../redux/store';
 
 const Home = () => {
-  const dispatch = useDispatch<any>();
+  const dispatch = useDispatch<AppDispatch>();
   const location = useLocation();
   const userToken = localStorage.getItem('token');
   const navigate = useNavigate();
@@ -21,8 +23,8 @@ const hashCondition = location.hash === '#login' || location.hash === '#register
       if (hashCondition) {
         navigate('/');
       }
+      verifyTokenExpiration(userToken);
     }
-    // verifyTokenExpiration(userToken, navigate);
     dispatch(fetchAllProducts());
   }, [dispatch, navigate, userToken, hashCondition]);
 
