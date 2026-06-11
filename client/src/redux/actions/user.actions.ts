@@ -16,5 +16,7 @@ export const signInSuccess = () => async (dispatch: Dispatch) => {
 
 export const logOut = () => async (dispatch: Dispatch) => {
   localStorage.removeItem('token');
+  localStorage.removeItem('userRole');
+  localStorage.removeItem('userName');
   dispatch({ type: LOGOUT_USER });
 };

@@ -16,7 +16,8 @@ export default function App() {
   const { theme } = useTheme();
   const userToken = localStorage.getItem('token');
   const location = useLocation();
-  const isAdmin = localStorage.getItem('userRole')?.includes('ADMIN');
+  const storedRole = localStorage.getItem('userRole');
+  const isAdmin = storedRole ? JSON.parse(storedRole) === 'ADMIN' : false;
 
   type RouteType = {
     path: string;
@@ -47,6 +48,7 @@ export default function App() {
     { path: '/admin', element: <Admin /> },
     { path: '/admin/:id/editing', element: <ProductForm /> },
     { path: '/admin/users', element: <UsersHistory /> },
+    { path: '*', element: <Admin /> },
   ];
 
   return (

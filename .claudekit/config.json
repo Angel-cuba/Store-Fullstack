@@ -1,0 +1,10 @@
+{
+  "hooks": {
+    "test-changed": {
+      "command": "cd client && npm test --"
+    },
+    "test-project": {
+      "command": "cd client && npm test -- --watchAll=false"
+    }
+  }
+}
