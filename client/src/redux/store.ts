@@ -1,16 +1,21 @@
-import { createStore, applyMiddleware } from 'redux';
-import thunk from 'redux-thunk';
+import { createStore, applyMiddleware, AnyAction } from 'redux';
+import thunk, { ThunkDispatch } from 'redux-thunk';
 import { AppState } from '../types/ProductType';
 import createRootReducer from './reducers';
-import { cartInitialState } from './reducers/cart.reducer';
 import { productsInitialState } from './reducers/products.reducer';
 import { userInitialState } from './reducers/user.reducer';
+import { loadCart, saveCart } from '../util/cartStorage';
 
 const appState: AppState = {
   products: productsInitialState,
-  cart: cartInitialState,
+  cart: loadCart(),
   user: userInitialState,
 };
 
 export const store = createStore(createRootReducer(), appState, applyMiddleware(thunk));
-export type AppDispatch = typeof store.dispatch;
+
+store.subscribe(() => {
+  saveCart(store.getState().cart);
+});
+
+export type AppDispatch = ThunkDispatch<AppState, unknown, AnyAction>;

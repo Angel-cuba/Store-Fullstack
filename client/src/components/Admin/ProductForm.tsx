@@ -7,13 +7,14 @@ import { commonStyles } from '../../pages/LoginPage';
 import { fetchProductById } from '../../redux/actions/products.action';
 import '../../styles/components/Admin/ProductForm.scss';
 import { AppState } from '../../types/ProductType';
+import { AppDispatch } from '../../redux/store';
 import { handleToast } from '../../util/helpers';
 import { Input } from '../Input';
 import View from './View';
 
 const ProductForm = () => {
-  const { id }: any = useParams();
-  const dispatch = useDispatch<any>();
+  const { id } = useParams<{ id?: string }>();
+  const dispatch = useDispatch<AppDispatch>();
 
   const { product } = useSelector((state: AppState) => state.products);
   const { user } = useSelector((state: AppState) => state.user);
@@ -62,9 +63,9 @@ const ProductForm = () => {
 
   const handleSubmit = () => {
     if (id) {
-      EditingProduct(id, body, user?.email);
+      EditingProduct(id!, body);
     } else {
-      NewProduct(body, user?.email);
+      NewProduct(body);
       //Adding some animation
       handleToast('Save');
       //Setting all fields to default
@@ -126,7 +127,7 @@ const ProductForm = () => {
             value={rating}
             onChange={handleRating}
             style={commonStyles}
-            message={id && product?.rating}
+            message={id ? String(product?.rating) : undefined}
           />
           <Input
             type="number"

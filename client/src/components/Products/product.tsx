@@ -7,29 +7,28 @@ import { Link, useLocation } from 'react-router-dom';
 import { DeletingProduct } from '../../api/requests';
 import { fetchAllProducts } from '../../redux/actions/products.action';
 import { AppState } from '../../types/ProductType';
+import { AppDispatch } from '../../redux/store';
 import { verifyTokenExpiration } from '../../util/tokenExpired';
+import { IProducts } from '../../types/types';
 import UserButtons from './UserButtons';
 import { handleToast } from '../../util/helpers';
 
-const Products = ({ product }: any) => {
+const Products = ({ product }: { product: IProducts }) => {
   const location = useLocation();
   const [adminLocation, setAdminLocation] = React.useState(false);
-  const dispatch = useDispatch<any>();
-  const { user } = useSelector((state: AppState) => state.user);
+  const dispatch = useDispatch<AppDispatch>();
 
   React.useEffect(() => {
-    //Check if token is valid
-    const token = localStorage.getItem('token') as any;
-    verifyTokenExpiration(token);
+    const token = localStorage.getItem('token');
+    if (token) verifyTokenExpiration(token);
     //Check if user is admin
     if (location.pathname.includes('admin')) {
       setAdminLocation(true);
     }
   }, [location]);
 
-  const handleDelete = (id: any) => {
-    console.log('delete with id: ' + id);
-    DeletingProduct(id, user?.email);
+  const handleDelete = (id: string) => {
+    DeletingProduct(id);
     handleToast('Deleting product');
   };
 
@@ -81,7 +80,7 @@ const Products = ({ product }: any) => {
         </div>
         <div className="" onClick={handleMessage}>
           {adminLocation && (
-            <button className="btn-delete" onClick={() => handleDelete(product?._id)}>
+            <button className="btn-delete" onClick={() => product._id && handleDelete(product._id)}>
               <FaTrashAlt />
             </button>
           )}

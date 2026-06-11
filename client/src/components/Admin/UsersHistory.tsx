@@ -8,24 +8,28 @@ import Loading from '../Loading';
 import SingleUserHistory from './SingleUserHistory';
 import '../../styles/components/User/UsersHistory.scss';
 
+type PurchaseRecord = {
+  _id: string;
+  user: { _id: string; name: string; lastname: string; picture: string };
+  products: unknown[];
+};
+
 const UsersHistory = () => {
-  const { user } = useSelector((state: AppState) => state.user);
-  const [fetchHistory, setFetchHistory] = React.useState<any>(null);
-  const [history, setHistory] = React.useState<any>(null);
-  const [openHistory, setOpenHistory] = React.useState<any>(false);
-  console.log('history', history);
-  console.log('the history of all users', fetchHistory);
+  const [fetchHistory, setFetchHistory] = React.useState<PurchaseRecord[] | null>(null);
+
+  const [history, setHistory] = React.useState<PurchaseRecord[] | null>(null);
+  const [openHistory, setOpenHistory] = React.useState<boolean>(false);
 
   React.useEffect(() => {
-    getAllHistory(user?.email).then((res) => setFetchHistory(res));
-  }, [user]);
+    getAllHistory().then((res) => setFetchHistory(res));
+  }, []);
 
   if (!fetchHistory) {
     return <Loading />;
   }
 
-  const PurchasesByUser = (thisUserId: any) => {
-    const response = fetchHistory.filter((purchase: any) => {
+  const PurchasesByUser = (thisUserId: string) => {
+    const response = (fetchHistory ?? []).filter((purchase) => {
       if (purchase.user._id === thisUserId) {
         return purchase.products;
       }
@@ -39,12 +43,12 @@ const UsersHistory = () => {
   };
 
   //Fetching uniques users
-  const ids = fetchHistory.map((x: any) => x.user._id);
-  const filtered = fetchHistory.filter(
-    (history: any, index: number) => !ids.includes(history.user._id, index + 1)
+  const ids = (fetchHistory ?? []).map((x) => x.user._id);
+  const filtered = (fetchHistory ?? []).filter(
+    (h, index) => !ids.includes(h.user._id, index + 1)
   );
 
-  const openSingleUserPurchase = (userId: any) => {
+  const openSingleUserPurchase = (userId: string) => {
     console.log('click', userId);
     if (history && history[0]?.user._id === userId) {
       setOpenHistory(!openHistory);
@@ -63,7 +67,7 @@ const UsersHistory = () => {
         {!fetchHistory ? (
           <Loading />
         ) : (
-          filtered.map((product: any, index: number) => (
+          filtered.map((product, index) => (
             <div className="user-container" key={product._id}>
               <div key={index} className="user">
                 <div className="user-face">
@@ -82,13 +86,13 @@ const UsersHistory = () => {
                     openHistory ? closePurchasesByUser : () => PurchasesByUser(product.user._id)
                   }
                 >
-                  {openHistory && history[0].user._id === product.user._id ? 'Close' : 'Open'}
+                  {openHistory && history?.[0]?.user._id === product.user._id ? 'Close' : 'Open'}
                 </button>
               </div>
-              {openHistory && history[0].user._id === product.user._id ? (
+              {openHistory && history?.[0]?.user._id === product.user._id ? (
                 <div
                   className={
-                    openHistory && history[0].user._id === product.user._id
+                    openHistory && history?.[0]?.user._id === product.user._id
                       ? 'user-history'
                       : 'user-history-hidden'
                   }

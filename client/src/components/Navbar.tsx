@@ -8,14 +8,14 @@ import { ToggleTheme } from './ToggleTheme';
 import UserHistory from './User/History';
 import { useSelector } from 'react-redux';
 import { AppState } from '../types/ProductType';
+import { AppDispatch } from '../redux/store';
 
 const Navbar = () => {
   //:TODO: Fix this user data request
-  const { user }: any = useSelector((state: AppState) => state.user);
-  console.log("🚀 ~ file: Navbar.tsx:15 ~ Navbar ~ user:", user)
+  const { user } = useSelector((state: AppState) => state.user);
   const userToken: string | null = localStorage.getItem('token');
   const userRole: string | null = localStorage.getItem('userRole');
-  const dispatch = useDispatch<any>();
+  const dispatch = useDispatch<AppDispatch>();
 
   const navigate = useNavigate();
 

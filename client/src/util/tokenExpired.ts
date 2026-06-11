@@ -1,19 +1,25 @@
 import jwtDecode, { JwtPayload } from 'jwt-decode';
-import history from './history';
+import { handleToast } from './helpers';
 
-export const verifyTokenExpiration = async (token: string) => {
+function clearSession() {
+  localStorage.removeItem('token');
+  localStorage.removeItem('userRole');
+  localStorage.removeItem('userName');
+}
+
+export const verifyTokenExpiration = (token: string) => {
   try {
     const decoded: JwtPayload = jwtDecode(token);
-    const isExpired = (decoded.exp as any) * 1000 < new Date().getTime();
+    const isExpired = (decoded.exp as number) * 1000 < Date.now();
     if (isExpired) {
-      localStorage.removeItem('token');
-      //  if(history.location.pathname === '/login'){
-      // }
-      history.push('/login');
+      clearSession();
+      handleToast('Redirect');
+      window.location.replace('/login');
       return { isVerified: false, decodedUser: null };
     }
     return { isVerified: true, decodedUser: decoded };
-  } catch (error) {
+  } catch {
+    clearSession();
     return { isVerified: false, decodedUser: null };
   }
 };

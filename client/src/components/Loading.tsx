@@ -11,7 +11,7 @@ const Loading = () => {
   const location = useLocation();
 
   //Cart history
-  const { inCart }: any = useSelector((state: AppState) => state.cart);
+  const { inCart } = useSelector((state: AppState) => state.cart);
   //TODO: Fix this useEffect
   // React.useEffect(() => {
   //   const token = localStorage.getItem('token') as string;
@@ -37,7 +37,7 @@ const Loading = () => {
         ) : (
           <h1>Loading...</h1>
         )}
-        {location.pathname === '/history' && inCart?.length > 0 ? (
+        {location.pathname === '/history' && (inCart?.length ?? 0) > 0 ? (
           <h1>Waiting for user purchase</h1>
         ) : null}
       </div>

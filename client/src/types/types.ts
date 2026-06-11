@@ -1,5 +1,5 @@
 export interface IProducts {
-  _id?: number;
+  _id?: string;
   name: string;
   price: number;
   description: string;
@@ -32,12 +32,12 @@ export type IUser = {
   email: string;
   picture: string;
   role: string;
-  band: boolean;
+  ban: boolean;
 };
 
 //Cart item properties
 export type ICartItem = {
-  _id?: number;
+  _id?: string;
   name: string;
   price: number;
   description: string;

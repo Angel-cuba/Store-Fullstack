@@ -1,34 +1,41 @@
-import { BASE_URL } from '../util/helpers';
 import axios from 'axios';
+import { BASE_URL } from '../util/helpers';
 import { verifyTokenExpiration } from '../util/tokenExpired';
 
-export const sendOrder = async (order: any) => {
-  let token = localStorage.getItem('token') as any;
-  //Check if token is valid
-  const { isVerified } = await verifyTokenExpiration(token);
-  if (!isVerified) return;
+type OrderPayload = { products: string[]; shippingAddress?: string };
 
-  //Otherwise continue with this request
+function getVerifiedToken(): string | null {
+  const token = localStorage.getItem('token');
+  if (!token) return null;
+  const { isVerified } = verifyTokenExpiration(token);
+  return isVerified ? token : null;
+}
+
+export const createPaymentIntent = async (amount: number): Promise<{ clientSecret: string } | undefined> => {
+  const token = getVerifiedToken();
+  if (!token) return;
+  const response = await axios.post(
+    `${BASE_URL}/orders/payment-intent`,
+    { amount },
+    { headers: { Authorization: `Bearer ${token}` } }
+  );
+  return response.data;
+};
+
+export const sendOrder = async (order: OrderPayload) => {
+  const token = getVerifiedToken();
+  if (!token) return;
   const response = await axios.post(`${BASE_URL}/orders/create`, order, {
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
+    headers: { Authorization: `Bearer ${token}` },
   });
   return response.data;
 };
 
 export const orderHistory = async () => {
-  let token = localStorage.getItem('token') as any;
-  //Check if token is valid
-  const { isVerified } = await verifyTokenExpiration(token);
-  if (!isVerified) return;
-
-  //Otherwise continue with this request
+  const token = getVerifiedToken();
+  if (!token) return;
   const response = await axios.get(`${BASE_URL}/orders/user`, {
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
+    headers: { Authorization: `Bearer ${token}` },
   });
-  console.log('response', response.data);
   return response.data;
 };

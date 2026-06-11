@@ -1,7 +1,6 @@
 import { toast } from 'react-hot-toast';
 
-export const BASE_URL =
-  process.env.NODE_ENV === 'development' ? 'http://localhost:3001' : process.env.ORIGIN;
+export const BASE_URL = process.env.REACT_APP_API_URL;
 
 const handleEmptyFields = () => {
   toast.success('Make sure you have filled all the required', {

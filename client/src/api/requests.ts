@@ -1,8 +1,14 @@
 import axios from 'axios';
-
 import { IProducts } from '../types/types';
 import { BASE_URL } from '../util/helpers';
 import { verifyTokenExpiration } from '../util/tokenExpired';
+
+function getVerifiedToken(): string | null {
+  const token = localStorage.getItem('token');
+  if (!token) return null;
+  const { isVerified } = verifyTokenExpiration(token);
+  return isVerified ? token : null;
+}
 
 export const AllProducts = async () => {
   const response = await axios.get(`${BASE_URL}/products/all`);
@@ -14,50 +20,32 @@ export const ProductById = async (id: string) => {
   return response.data;
 };
 
-export const NewProduct = async (product: IProducts, email: any) => {
-  let token = localStorage.getItem('token') as any;
-  const { isVerified } = await verifyTokenExpiration(token);
-  if (!isVerified) return;
-  //Continue here if token is verified
+export const NewProduct = async (product: IProducts) => {
+  const token = getVerifiedToken();
+  if (!token) return;
   const response = await axios.post(`${BASE_URL}/products`, product, {
-    headers: {
-      Authorization: `Bearer ${token}`,
-      user: `${email}`,
-    },
+    headers: { Authorization: `Bearer ${token}` },
   });
-  console.log(response.data);
   return response.data;
 };
 
-export const EditingProduct = async (id: string, product: IProducts, email: any) => {
-  const token = localStorage.getItem('token') as any;
-  const { isVerified } = await verifyTokenExpiration(token);
-  if (!isVerified) return;
-  //Continue here if token is verified
-  console.log(id, product);
+export const EditingProduct = async (id: string, product: IProducts) => {
+  const token = getVerifiedToken();
+  if (!token) return;
   const response = await axios.put(`${BASE_URL}/products/${id}`, product, {
     headers: {
       'Content-Type': 'application/json',
-      Authorization: `Bearer ${localStorage.getItem('token')}`,
-      user: `${email}`,
+      Authorization: `Bearer ${token}`,
     },
   });
-
-  console.log(response.data);
   return response.data;
 };
 
-export const DeletingProduct = async (id: string, email: any) => {
-  const token = localStorage.getItem('token') as any;
-  const { isVerified } = await verifyTokenExpiration(token);
-  if (!isVerified) return;
-  //Continue here if token is verified
+export const DeletingProduct = async (id: string) => {
+  const token = getVerifiedToken();
+  if (!token) return;
   const response = await axios.delete(`${BASE_URL}/products/${id}`, {
-    headers: {
-      Authorization: `Bearer ${localStorage.getItem('token')}`,
-      user: `${email}`,
-    },
+    headers: { Authorization: `Bearer ${token}` },
   });
-  console.log(response.data);
   return response.data;
 };

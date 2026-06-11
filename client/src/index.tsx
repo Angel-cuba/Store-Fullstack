@@ -6,16 +6,26 @@ import { BrowserRouter as Router } from 'react-router-dom';
 import { ThemeProvider } from './context/ThemeProvider';
 import { Provider } from 'react-redux';
 import { store } from './redux/store';
+import ErrorBoundary from './components/ErrorBoundary';
+import { GoogleOAuthProvider } from '@react-oauth/google';
 import './styles/index.scss';
 
+const GOOGLE_CLIENT_ID = process.env.REACT_APP_GOOGLE_CLIENT_ID ?? '';
+
 ReactDOM.render(
-    <ThemeProvider>
-      <Provider store={store}>
-        <Router>
-          <App />
-        </Router>
-      </Provider>
-    </ThemeProvider>,
+  <GoogleOAuthProvider clientId={GOOGLE_CLIENT_ID}>
+    <ErrorBoundary>
+      <ThemeProvider>
+        <Provider store={store}>
+          <Router>
+            <ErrorBoundary>
+              <App />
+            </ErrorBoundary>
+          </Router>
+        </Provider>
+      </ThemeProvider>
+    </ErrorBoundary>
+  </GoogleOAuthProvider>,
   document.getElementById('root')
 );
 

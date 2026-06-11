@@ -2,40 +2,116 @@ import React from 'react';
 import { Toaster } from 'react-hot-toast';
 import { useSelector } from 'react-redux';
 import { Link, useNavigate } from 'react-router-dom';
-import { sendOrder } from '../../api/orders';
+import { loadStripe } from '@stripe/stripe-js';
+import { Elements, PaymentElement, useStripe, useElements } from '@stripe/react-stripe-js';
+import { createPaymentIntent, sendOrder } from '../../api/orders';
 import '../../styles/components/Products/Payments.scss';
 import { AppState } from '../../types/ProductType';
 import { ICartItem } from '../../types/types';
 import { handleToast } from '../../util/helpers';
 
-const Payment = () => {
-  const [pay, setPay] = React.useState();
-  console.log('body to backend: ', pay);
+const stripePromise = loadStripe(process.env.REACT_APP_STRIPE_PUBLIC_KEY as string);
 
-  const { inCart } = useSelector((state: AppState) => state.cart);
-  const { user } = useSelector((state: AppState) => state.user);
+const amountToPay = (items: ICartItem[]) =>
+  items.reduce((sum, item) => sum + item.price * item.amount, 0);
 
+// Inner form — only rendered inside <Elements> so useStripe/useElements work
+type AddressFields = {
+  fullName: string;
+  address: string;
+  city: string;
+  state: string;
+  country: string;
+};
+
+const CheckoutForm = ({
+  productIds,
+  shippingAddress,
+}: {
+  productIds: string[];
+  shippingAddress: AddressFields;
+}) => {
+  const stripe = useStripe();
+  const elements = useElements();
   const navigate = useNavigate();
+  const [loading, setLoading] = React.useState(false);
+  const [error, setError] = React.useState<string | null>(null);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!stripe || !elements) return;
+
+    setLoading(true);
+    setError(null);
+
+    const { error: stripeError } = await stripe.confirmPayment({
+      elements,
+      redirect: 'if_required',
+    });
+
+    if (stripeError) {
+      setError(stripeError.message ?? 'Payment failed');
+      setLoading(false);
+      return;
+    }
+
+    const { fullName, address, city, state, country } = shippingAddress;
+    const addressString = [fullName, address, city, state, country]
+      .filter(Boolean)
+      .join(', ');
+
+    await sendOrder({ products: productIds, shippingAddress: addressString });
+    handleToast('Save');
+    setLoading(false);
+    navigate('/');
+  };
+
+  return (
+    <form onSubmit={handleSubmit}>
+      <PaymentElement />
+      {error && <p style={{ color: 'red', marginTop: '0.5rem' }}>{error}</p>}
+      <div className="buttons" style={{ marginTop: '1rem' }}>
+        <button className="btn-payment" type="submit" disabled={!stripe || loading}>
+          {loading ? 'Processing...' : 'Pay'}
+        </button>
+        <button className="btn-payment" type="button" onClick={() => navigate('/')}>
+          Cancel
+        </button>
+      </div>
+    </form>
+  );
+};
+
+const Payment = () => {
+  const { inCart } = useSelector((state: AppState) => state.cart);
+  const [clientSecret, setClientSecret] = React.useState<string | null>(null);
+  const [address, setAddress] = React.useState<AddressFields>({
+    fullName: '',
+    address: '',
+    city: '',
+    state: '',
+    country: '',
+  });
+
+  const productIds = (inCart ?? [])
+    .map((item: ICartItem) => item._id)
+    .filter((id): id is string => id !== undefined);
+
+  const total = inCart ? amountToPay(inCart) : 0;
+
+  const handleAddressChange =
+    (field: keyof AddressFields) => (e: React.ChangeEvent<HTMLInputElement>) => {
+      setAddress((prev) => ({ ...prev, [field]: e.target.value }));
+    };
 
   React.useEffect(() => {
     document.title = 'Payment';
-    const fetchCart = () => {
-      let arraysOfIds = inCart?.map((item: ICartItem) => item._id);
-      setPay({ user: user?.id, products: arraysOfIds } as any);
-    };
-    //Callling the function inside
-    fetchCart();
-  }, [inCart, user]);
-
-  //Calculate total price of cart
-  const amountToPay = (items: ICartItem[]) =>
-    items.reduce((sum, item) => sum + item.price * item.amount, 0);
-  //Sending products to customer history
-  const sendPayment = () => {
-    sendOrder(pay);
-    handleToast('Save');
-    navigate('/');
-  };
+    if (total > 0) {
+      createPaymentIntent(total).then((res) => {
+        if (res?.clientSecret) setClientSecret(res.clientSecret);
+      });
+    }
+  }, [total]);
 
   return (
     <div className="container">
@@ -46,7 +122,7 @@ const Payment = () => {
           padding: '.53rem .87rem',
           borderRadius: '6px',
           textDecoration: 'none',
-          margin: '3rem 1rem ',
+          margin: '3rem 1rem',
           fontWeight: 'bold',
           textTransform: 'uppercase',
           cursor: 'pointer',
@@ -58,9 +134,9 @@ const Payment = () => {
 
       <div className="view">
         <div className="payment_data">
-          {inCart?.length === 0
+          {!inCart || inCart.length === 0
             ? 'Go to buy some products'
-            : inCart?.map((item: any, index: number) => (
+            : inCart.map((item: ICartItem, index: number) => (
                 <div className="payment_item" key={index}>
                   <div className="payment_item_img">
                     <img src={item.image} alt="" />
@@ -72,21 +148,25 @@ const Payment = () => {
                 </div>
               ))}
         </div>
+
         <div className="user_data">
-          <input type="text" placeholder="Name" />
-          <input type="text" placeholder="Address" />
-          <input type="text" placeholder="City" />
-          <input type="text" placeholder="State" />
-          <input type="text" placeholder="Country" />
-          <div className="buttons">
-            <button className="btn-payment" onClick={sendPayment}>
-              Pay
-            </button>
-            <button className="btn-payment" onClick={() => navigate('/')}>
-              Cancel
-            </button>
-          </div>
-          <span>Total: {!inCart ? null : amountToPay(inCart).toFixed(2)} €</span>
+          <input type="text" placeholder="Full name" value={address.fullName} onChange={handleAddressChange('fullName')} />
+          <input type="text" placeholder="Address" value={address.address} onChange={handleAddressChange('address')} />
+          <input type="text" placeholder="City" value={address.city} onChange={handleAddressChange('city')} />
+          <input type="text" placeholder="State" value={address.state} onChange={handleAddressChange('state')} />
+          <input type="text" placeholder="Country" value={address.country} onChange={handleAddressChange('country')} />
+
+          <span style={{ margin: '1rem 0', display: 'block' }}>
+            Total: {total.toFixed(2)} €
+          </span>
+
+          {clientSecret ? (
+            <Elements stripe={stripePromise} options={{ clientSecret }}>
+              <CheckoutForm productIds={productIds} shippingAddress={address} />
+            </Elements>
+          ) : total > 0 ? (
+            <p>Loading payment form...</p>
+          ) : null}
         </div>
       </div>
       <Toaster />

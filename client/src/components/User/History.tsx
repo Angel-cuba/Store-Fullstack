@@ -2,13 +2,16 @@ import React from 'react';
 import { useSelector } from 'react-redux';
 import { orderHistory } from '../../api/orders';
 import { AppState } from '../../types/ProductType';
+import { IProducts } from '../../types/types';
 import Loading from '../Loading';
 import '../../styles/components/User/History.scss';
 
+type Order = { _id: string; createdAt: string; products: IProducts[] };
+
 const History = () => {
   const [open, setOpen] = React.useState<boolean>(false);
-  const { user }: any = useSelector((state: AppState) => state.user);
-  const [history, setHistory] = React.useState<any>();
+  const { user } = useSelector((state: AppState) => state.user);
+  const [history, setHistory] = React.useState<Order[]>();
 
   React.useEffect(() => {
     if (open) {
@@ -22,7 +25,7 @@ const History = () => {
     setOpen(!open);
   };
 
-  const dateTime = (time: any) => {
+  const dateTime = (time: string) => {
     const date = new Date(time);
     const month = date.getMonth() + 1;
     const day = date.getDate();
@@ -54,7 +57,7 @@ const History = () => {
           {!history ? (
             <Loading />
           ) : (
-            history.map((product: any) => {
+            history.map((product: Order) => {
               return (
                 <div key={product._id} className="each">
                   <div className="dateOfEachProd">
@@ -63,7 +66,7 @@ const History = () => {
                       <span>{dateTime(product.createdAt)}</span>
                     </h2>
                   </div>
-                  {product.products.map((product: any, index: number) => {
+                  {product.products.map((product: IProducts, index: number) => {
                     return (
                       <div key={index} className="product">
                         <div className="product-image">
