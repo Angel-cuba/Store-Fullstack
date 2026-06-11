@@ -1,0 +1,36 @@
+# Dependencies
+node_modules/
+
+# Build output
+dist/
+build/
+
+# Environment — never commit real values
+.env
+.env.local
+.env.development
+.env.production
+.env.test
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE / AI tools
+.vscode/
+.idea/
+.cursor/
+.qodo/
+.aider*
+
+# Coverage
+coverage/
+
+# Misc
+*.tsbuildinfo
