@@ -1,14 +1,58 @@
-import { View, Text, FlatList, TouchableOpacity, Alert } from 'react-native';
+import { View, Text, FlatList, TouchableOpacity, Alert, ActivityIndicator } from 'react-native';
+import { useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
+import { useStripe } from '@stripe/stripe-react-native';
 import { MotiView } from 'moti';
 import { AppState, AppDispatch } from '../../shared/redux/store';
-import { ADD_CART, REMOVE_FROM_CART } from '../../shared/types/CartActions';
+import { ADD_CART, CLEAR_CART, REMOVE_FROM_CART } from '../../shared/types/CartActions';
+import { createPaymentIntent, sendOrder } from '../../shared/api/orders';
+import type { ICartItem } from '../../shared/types/types';
 
 export default function CartScreen() {
   const dispatch = useDispatch<AppDispatch>();
+  const { initPaymentSheet, presentPaymentSheet } = useStripe();
   const cart = useSelector((s: AppState) => s.cart.inCart);
+  const [checkoutLoading, setCheckoutLoading] = useState(false);
 
   const total = cart.reduce((acc: number, item) => acc + item.price * item.amount, 0);
+
+  const productIds = cart
+    .map((item: ICartItem) => item._id)
+    .filter((id): id is string => id !== undefined);
+
+  const handleCheckout = async () => {
+    if (productIds.length === 0) return;
+    setCheckoutLoading(true);
+    try {
+      const { clientSecret } = await createPaymentIntent(total);
+
+      const { error: initError } = await initPaymentSheet({
+        paymentIntentClientSecret: clientSecret,
+        merchantDisplayName: 'Store',
+        defaultBillingDetails: { name: '' },
+      });
+      if (initError) {
+        Alert.alert('Payment error', initError.message);
+        return;
+      }
+
+      const { error: presentError } = await presentPaymentSheet();
+      if (presentError) {
+        if (presentError.code !== 'Canceled') {
+          Alert.alert('Payment failed', presentError.message);
+        }
+        return;
+      }
+
+      await sendOrder({ products: productIds });
+      dispatch({ type: CLEAR_CART });
+      Alert.alert('Order placed', 'Your payment was successful. Thank you!');
+    } catch {
+      Alert.alert('Error', 'Something went wrong. Please try again.');
+    } finally {
+      setCheckoutLoading(false);
+    }
+  };
 
   if (cart.length === 0) {
     return (
@@ -77,9 +121,12 @@ export default function CartScreen() {
         <TouchableOpacity
           className="bg-primary rounded-xl py-4 items-center"
           activeOpacity={0.8}
-          onPress={() => Alert.alert('Checkout', 'Stripe payment — coming in next sprint')}
+          onPress={handleCheckout}
+          disabled={checkoutLoading}
         >
-          <Text className="text-white font-bold text-base">Checkout</Text>
+          {checkoutLoading
+            ? <ActivityIndicator color="#ffffff" />
+            : <Text className="text-white font-bold text-base">Checkout</Text>}
         </TouchableOpacity>
       </View>
     </View>

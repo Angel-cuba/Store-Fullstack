@@ -1,5 +1,5 @@
 import type { UnknownAction } from 'redux';
-import { ADD_CART, CartState, REMOVE_FROM_CART } from '../../types/CartActions';
+import { ADD_CART, CartState, CLEAR_CART, REMOVE_FROM_CART } from '../../types/CartActions';
 import type { ICartItem } from '../../types/types';
 
 export const cartInitialState: CartState = { inCart: [] };
@@ -32,6 +32,8 @@ export default function cartReducer(state = cartInitialState, action: UnknownAct
       }
       return { ...state, inCart: state.inCart.filter((i) => i._id !== item._id) };
     }
+    case CLEAR_CART:
+      return cartInitialState;
     default:
       return state;
   }
