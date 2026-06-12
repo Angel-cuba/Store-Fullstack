@@ -44,7 +44,12 @@ export default function CartScreen() {
         return;
       }
 
-      await sendOrder({ products: productIds });
+      try {
+        await sendOrder({ products: productIds });
+      } catch {
+        Alert.alert('Order error', 'Payment succeeded but order could not be recorded. Please contact support.');
+        return;
+      }
       dispatch({ type: CLEAR_CART });
       Alert.alert('Order placed', 'Your payment was successful. Thank you!');
     } catch {

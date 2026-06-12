@@ -64,7 +64,13 @@ const CheckoutForm = ({
       .filter(Boolean)
       .join(', ');
 
-    await sendOrder({ products: productIds, shippingAddress: addressString });
+    try {
+      await sendOrder({ products: productIds, shippingAddress: addressString });
+    } catch {
+      setError('Payment succeeded but order could not be recorded. Please contact support.');
+      setLoading(false);
+      return;
+    }
     onSuccess();
     handleToast('Save');
     setLoading(false);
