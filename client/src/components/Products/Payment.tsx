@@ -1,13 +1,15 @@
 import React from 'react';
 import { Toaster } from 'react-hot-toast';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { Link, useNavigate } from 'react-router-dom';
 import { loadStripe } from '@stripe/stripe-js';
 import { Elements, PaymentElement, useStripe, useElements } from '@stripe/react-stripe-js';
 import { createPaymentIntent, sendOrder } from '../../api/orders';
 import '../../styles/components/Products/Payments.scss';
 import { AppState } from '../../types/ProductType';
+import { AppDispatch } from '../../redux/store';
 import { ICartItem } from '../../types/types';
+import { CLEAR_CART } from '../../types/CartActions';
 import { handleToast } from '../../util/helpers';
 
 const stripePromise = loadStripe(process.env.REACT_APP_STRIPE_PUBLIC_KEY as string);
@@ -27,9 +29,11 @@ type AddressFields = {
 const CheckoutForm = ({
   productIds,
   shippingAddress,
+  onSuccess,
 }: {
   productIds: string[];
   shippingAddress: AddressFields;
+  onSuccess: () => void;
 }) => {
   const stripe = useStripe();
   const elements = useElements();
@@ -61,6 +65,7 @@ const CheckoutForm = ({
       .join(', ');
 
     await sendOrder({ products: productIds, shippingAddress: addressString });
+    onSuccess();
     handleToast('Save');
     setLoading(false);
     navigate('/');
@@ -84,6 +89,7 @@ const CheckoutForm = ({
 
 const Payment = () => {
   const { inCart } = useSelector((state: AppState) => state.cart);
+  const dispatch = useDispatch<AppDispatch>();
   const [clientSecret, setClientSecret] = React.useState<string | null>(null);
   const [address, setAddress] = React.useState<AddressFields>({
     fullName: '',
@@ -162,7 +168,11 @@ const Payment = () => {
 
           {clientSecret ? (
             <Elements stripe={stripePromise} options={{ clientSecret }}>
-              <CheckoutForm productIds={productIds} shippingAddress={address} />
+              <CheckoutForm
+                productIds={productIds}
+                shippingAddress={address}
+                onSuccess={() => dispatch({ type: CLEAR_CART })}
+              />
             </Elements>
           ) : total > 0 ? (
             <p>Loading payment form...</p>

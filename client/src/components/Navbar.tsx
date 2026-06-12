@@ -1,7 +1,7 @@
 import React from 'react';
 import { useDispatch } from 'react-redux';
 import { Link, useNavigate } from 'react-router-dom';
-import { signInSuccess } from '../redux/actions/user.actions';
+import { logOut, signInSuccess } from '../redux/actions/user.actions';
 import '../styles/components/Navbar.scss';
 import Cart from './Products/Cart';
 import { ToggleTheme } from './ToggleTheme';
@@ -11,7 +11,6 @@ import { AppState } from '../types/ProductType';
 import { AppDispatch } from '../redux/store';
 
 const Navbar = () => {
-  //:TODO: Fix this user data request
   const { user } = useSelector((state: AppState) => state.user);
   const userToken: string | null = localStorage.getItem('token');
   const userRole: string | null = localStorage.getItem('userRole');
@@ -20,7 +19,7 @@ const Navbar = () => {
   const navigate = useNavigate();
 
   const logoutUser = () => {
-    localStorage.clear();
+    dispatch(logOut());
     navigate('/login');
   };
 

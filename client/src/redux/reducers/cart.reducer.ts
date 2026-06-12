@@ -1,4 +1,4 @@
-import { ADD_CART, CartActions, CartState, REMOVE_FROM_CART } from '../../types/CartActions';
+import { ADD_CART, CartActions, CartState, CLEAR_CART, REMOVE_FROM_CART } from '../../types/CartActions';
 
 export const cartInitialState: CartState = {
   inCart: null,
@@ -51,6 +51,8 @@ export default function cart(state = cartInitialState, action: CartActions) {
       return { ...state, inCart: removedFromCart };
     }
 
+    case CLEAR_CART:
+      return cartInitialState;
     default:
       return state;
   }
